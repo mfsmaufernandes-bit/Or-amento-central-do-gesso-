@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Central do Gesso — Gerador de Orçamentos</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--vm:#C8201A;--vd:#9E1710;--bg:#F5F4F2;--card:#fff;--bd:#E0DDD8;--tx:#1A1A1A;--t2:#6B6860;--vr:#1A7A4A;--az:#1A4A8A;--am:#F59E0B}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--tx);min-height:100vh}
+.hdr{background:var(--vm);padding:16px 24px;display:flex;align-items:center;gap:14px;box-shadow:0 2px 8px rgba(0,0,0,.15)}
+.hlg{width:48px;height:48px;background:#fff;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;color:var(--vm);text-align:center;line-height:1.2}
+.htx h1{color:#fff;font-size:18px;font-weight:700}.htx p{color:rgba(255,255,255,.85);font-size:12px;margin-top:1px}
+.main{max-width:920px;margin:0 auto;padding:24px 16px}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:20px;margin-bottom:16px}
+.sh{display:flex;align-items:center;gap:10px;margin-bottom:16px}
+.sn{width:28px;height:28px;background:var(--vm);color:#fff;border-radius:50%;font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.st{font-size:15px;font-weight:600}.ss{font-size:12px;color:var(--t2);margin-top:1px}
+.r2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
+@media(max-width:580px){.r2{grid-template-columns:1fr}}
+.fg{display:flex;flex-direction:column;gap:5px}
+.fg label{font-size:12px;font-weight:500;color:var(--t2)}
+.fg input,.fg textarea,.fg select{border:1px solid var(--bd);border-radius:8px;padding:9px 12px;font-size:13px;font-family:'Inter',sans-serif;background:#fff;color:var(--tx);width:100%;transition:border-color .15s}
+.fg input:focus,.fg textarea:focus,.fg select:focus{outline:none;border-color:var(--vm)}
+textarea{resize:vertical;min-height:110px}
+.btn{padding:10px 20px;border-radius:8px;border:none;font-size:13px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;transition:all .15s;display:inline-flex;align-items:center;gap:7px}
+.bp{background:var(--vm);color:#fff}.bp:hover{background:var(--vd)}.bp:disabled{background:#ccc;cursor:not-allowed}
+.bs{background:var(--bg);color:var(--tx);border:1px solid var(--bd)}
+.bpix{background:var(--vr);color:#fff}.bcard{background:var(--az);color:#fff}
+.bam{background:var(--am);color:#fff}
+.bsm{padding:7px 14px;font-size:12px}
+.ld{display:none;align-items:center;gap:10px;padding:14px;background:#FFF8F0;border:1px solid #FFD8A8;border-radius:8px;color:#8B4500;font-size:13px;margin-top:12px}
+.sp{width:18px;height:18px;border:2px solid #FFD8A8;border-top-color:#FF8A00;border-radius:50%;animation:spin .8s linear infinite;flex-shrink:0}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* REVISÃO */
+.rev{display:none}
+.rev-intro{background:#FFF8E1;border:1px solid #FFD54F;border-radius:8px;padding:12px 16px;font-size:13px;color:#7A5000;margin-bottom:14px}
+.item-rev{background:var(--card);border:1px solid var(--bd);border-radius:10px;padding:14px;margin-bottom:10px}
+.item-rev h4{font-size:13px;font-weight:600;margin-bottom:4px;display:flex;align-items:center;gap:8px}
+.item-rev .orig{font-size:11px;color:var(--t2);margin-bottom:10px}
+.opts{display:flex;flex-direction:column;gap:6px}
+.opt{display:flex;align-items:center;gap:10px;padding:9px 12px;border:1px solid var(--bd);border-radius:8px;cursor:pointer;transition:all .15s;font-size:13px}
+.opt:hover{border-color:var(--vm);background:#FFF5F5}
+.opt.sel{border-color:var(--vm);background:#FFF0EF;font-weight:500}
+.opt input[type=radio]{accent-color:var(--vm)}
+.badge-ok{background:#E6F9EE;color:#1A7A4A;font-size:11px;font-weight:600;padding:2px 8px;border-radius:10px}
+.badge-warn{background:#FFF3E0;color:#E65100;font-size:11px;font-weight:600;padding:2px 8px;border-radius:10px}
+.badge-err{background:#FFEBEE;color:#B71C1C;font-size:11px;font-weight:600;padding:2px 8px;border-radius:10px}
+
+/* QTD EDIT */
+.qty-row{display:flex;align-items:center;gap:8px;margin-top:8px}
+.qty-row label{font-size:12px;color:var(--t2)}
+.qty-row input{width:70px;padding:5px 8px;border:1px solid var(--bd);border-radius:6px;font-size:13px}
+
+/* RESULTADO */
+.res{display:none}
+.rh{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px}
+.rt{font-size:16px;font-weight:700}
+.rac{display:flex;gap:8px;flex-wrap:wrap}
+.tabs{display:flex;gap:8px;margin-bottom:14px}
+.tab{padding:8px 18px;border-radius:8px;border:1px solid var(--bd);background:var(--bg);font-size:13px;font-weight:500;cursor:pointer;transition:all .15s}
+.tp{background:var(--vr);color:#fff;border-color:var(--vr)}.tc{background:var(--az);color:#fff;border-color:var(--az)}
+.dwrap{background:#e8e6e0;padding:16px;border-radius:8px}
+.doc{background:#fff;max-width:680px;margin:0 auto;padding:28px 32px;font-size:10.5px;color:#1a1a1a;font-family:Arial,sans-serif;box-shadow:0 2px 12px rgba(0,0,0,.12)}
+.dh{display:flex;align-items:flex-start;gap:14px;margin-bottom:14px}
+.dlogo{width:72px;height:34px;background:#C8201A;border-radius:4px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:8px;font-weight:800;text-align:center;line-height:1.3;flex-shrink:0}
+.demp{flex:1}.demp strong{font-size:11px}.demp p{font-size:9px;color:#555;margin:1px 0}
+.dnum{text-align:right}.dlb{font-size:8.5px;color:#888}.dnb{font-size:20px;font-weight:700}
+.dhr{border:none;border-top:1px solid #ccc;margin:10px 0}
+.ddes{margin-bottom:10px;font-size:9.5px}.ddes strong{font-size:10.5px}
+.dmeta{display:flex;justify-content:space-between;margin-bottom:12px;font-size:9.5px}
+.pb{display:inline-block;padding:2px 8px;border-radius:10px;font-size:8.5px;font-weight:700}
+.ppix{background:#d4f5ea;color:#0a6644}.pcard{background:#dbeeff;color:#0a3d7a}
+.dstit{font-size:9px;color:#666;margin-bottom:5px}
+.dtab{width:100%;border-collapse:collapse;font-size:8.5px;margin-bottom:12px}
+.dtab th{background:#f0f0f0;padding:4px 5px;text-align:left;border-bottom:1px solid #ccc;font-size:8px;font-weight:700}
+.dtab td{padding:3px 5px;border-bottom:.5px solid #eee}
+.dsum{display:flex;justify-content:space-between;font-size:9px;margin-bottom:12px}
+.dtot{text-align:right;font-size:9.5px}
+.dr{display:flex;justify-content:flex-end;gap:20px;margin:2px 0}
+.drg{font-weight:700;font-size:10.5px;border-top:1px solid #999;padding-top:4px;margin-top:4px}
+.dfoot{margin-top:12px;font-size:8.5px;color:#777;border-top:.5px solid #ddd;padding-top:6px}
+.dobs{font-size:9px;color:#555;margin-top:10px}
+.info{background:#EEF4FF;border:1px solid #C5D9FF;border-radius:8px;padding:10px 14px;font-size:12px;color:#1A3A7A;margin-bottom:12px}
+.apikey-row{display:flex;gap:8px;align-items:center;margin-bottom:12px}
+.apikey-row input{flex:1;border:1px solid var(--bd);border-radius:8px;padding:9px 12px;font-size:13px;font-family:'Inter',sans-serif}
+.apikey-row input:focus{outline:none;border-color:var(--vm)}
+.api-hint{font-size:11px;color:var(--t2);margin-top:4px}
+</style>
+</head>
+<body>
+
+<div class="hdr">
+  <div class="hlg">CENTRAL<br>DO<br>GESSO</div>
+  <div class="htx"><h1>Gerador de Orçamentos</h1><p>Tradutor inteligente de listas do WhatsApp — PIX e Cartão</p></div>
+</div>
+
+<div class="main">
+
+<!-- STEP 0: API KEY -->
+<div class="card" id="card-api">
+  <div class="sh"><div class="sn">🔑</div><div><div class="st">Chave da API ChatGPT</div><div class="ss">Necessária para o tradutor inteligente funcionar</div></div></div>
+  <div class="info">A chave é salva apenas no seu navegador (localStorage) e nunca sai do seu computador. Você só precisa inserir uma vez.</div>
+  <div class="apikey-row">
+    <input type="password" id="apikey" placeholder="sk-..." autocomplete="off"/>
+    <button class="btn bp" id="btn-salvar" onclick="salvarChave()">Salvar</button>
+    <button class="btn bs" onclick="verChave()" id="btn-ver">👁 Ver</button>
+  </div>
+  <div class="api-hint">Obtenha sua chave em <strong>platform.openai.com/api-keys</strong></div>
+</div>
+
+<!-- STEP 1: DADOS -->
+<div class="card">
+  <div class="sh"><div class="sn">1</div><div><div class="st">Dados do Cliente</div><div class="ss">Preencha as informações básicas</div></div></div>
+  <div class="r2">
+    <div class="fg"><label>Nome / Razão Social</label><input id="cn" placeholder="Ex: João da Silva"/></div>
+    <div class="fg"><label>CPF / CNPJ</label><input id="cd" placeholder="000.000.000-00 - ISENTO"/></div>
+  </div>
+  <div class="r2">
+    <div class="fg"><label>Endereço</label><input id="ce" placeholder="Av. Exemplo, 123 - Bairro"/></div>
+    <div class="fg"><label>CEP / Cidade / UF</label><input id="cc" placeholder="06768-000 Taboão da Serra SP"/></div>
+  </div>
+  <div class="r2">
+    <div class="fg"><label>Nº do Orçamento</label><input id="on" placeholder="Ex: 8320"/></div>
+    <div class="fg"><label>Vendedor</label><input id="ov" value="5 - Fernando Fernandes"/></div>
+  </div>
+  <div class="r2">
+    <div class="fg"><label>Frete (R$) — 0 se sem frete</label><input type="number" id="of" value="0" min="0" step="0.01"/></div>
+    <div class="fg"><label>Data</label><input type="date" id="od"/></div>
+  </div>
+</div>
+
+<!-- STEP 2: LISTA -->
+<div class="card">
+  <div class="sh"><div class="sn">2</div><div><div class="st">Lista de Materiais</div><div class="ss">Cole exatamente como o cliente mandou no WhatsApp</div></div></div>
+  <div class="info">💡 Pode colar de qualquer jeito: <strong>1 gesso</strong>, <strong>chapa st 10un</strong>, <strong>montante 70 x 20pcs</strong> — a IA vai entender!</div>
+  <div class="fg"><label>Lista do cliente</label>
+    <textarea id="li" placeholder="Cole aqui...&#10;Ex:&#10;14 chapa drywall&#10;11 montante 48&#10;5 guia 48&#10;1 fita tela 45 metros"></textarea>
+  </div>
+  <div style="margin-top:12px">
+    <button class="btn bp" onclick="traduzir()" id="bg">🤖 Traduzir e Identificar Produtos</button>
+  </div>
+  <div class="ld" id="ld"><div class="sp"></div><span id="ld-txt">A IA está interpretando a lista...</span></div>
+</div>
+
+<!-- STEP 3: REVISÃO -->
+<div class="card rev" id="card-rev">
+  <div class="sh"><div class="sn">3</div><div><div class="st">Revisão dos Produtos</div><div class="ss">Confirme ou ajuste cada item antes de gerar o orçamento</div></div></div>
+  <div class="rev-intro">⚠️ Verifique os itens abaixo. Quando houver dúvida, selecione a opção correta antes de gerar.</div>
+  <div id="rev-itens"></div>
+  <div style="margin-top:16px;display:flex;gap:10px;flex-wrap:wrap">
+    <button class="btn bp" onclick="gerarOrcamento()" id="bg2">⚡ Gerar Orçamentos PIX e Cartão</button>
+    <button class="btn bs" onclick="voltarLista()">↩ Voltar</button>
+  </div>
+</div>
+
+<!-- RESULTADO -->
+<div class="res" id="res">
+  <div class="card">
+    <div class="rh">
+      <div class="rt" id="rt">Orçamentos Gerados</div>
+      <div class="rac">
+        <button class="btn bpix bsm" onclick="imprimir('pix')">🖨️ PDF PIX</button>
+        <button class="btn bcard bsm" onclick="imprimir('card')">🖨️ PDF Cartão</button>
+        <button class="btn bs bsm" onclick="novoOrc()">↩ Novo Orçamento</button>
+      </div>
+    </div>
+    <div class="tabs">
+      <button class="tab tp" id="tpix" onclick="showTab('pix')">💚 Proposta PIX</button>
+      <button class="tab" id="tcard" onclick="showTab('card')">💙 Proposta Cartão</button>
+    </div>
+    <div class="dwrap" id="ppix"></div>
+    <div class="dwrap" id="pcard" style="display:none"></div>
+  </div>
+</div>
+
+</div>
+
+<script>
+// ===== CATÁLOGO DE PRODUTOS (simplificado para busca precisa) =====
+const CAT = [
+  {c:"20012",d:"Gesso 40 Kg",pp:30.0,pc:34.9},
+  {c:"20315",d:"Gesso Saco de Nylon 40 Kg",pp:32.9,pc:32.9},
+  {c:"20300",d:"Gesso Saco de Nylon 50 Kg",pp:88.56,pc:88.56},
+  {c:"20013",d:"Gesso 1 Kg",pp:2.9,pc:2.9},
+  {c:"20014",d:"Gesso 10 Kg",pp:16.9,pc:16.9},
+  {c:"20023",d:"Gesso Cola 1 Kg",pp:5.9,pc:5.9},
+  {c:"20025",d:"Gesso Cola 20 Kg",pp:72.9,pc:72.9},
+  {c:"20024",d:"Gesso Cola 5 Kg",pp:19.9,pc:19.9},
+  {c:"1",d:"Canaleta F-530",pp:9.28,pc:10.92},
+  {c:"20342",d:"Canaleta F-530 (N) Nova",pp:16.07,pc:18.9},
+  {c:"20021",d:"Cantoneira 25 X 30",pp:5.46,pc:6.42},
+  {c:"20343",d:"Cantoneira (N) 25 X 30 Nova",pp:7.44,pc:8.76},
+  {c:"20237",d:"Cantoneira 14 X 30",pp:11.99,pc:11.99},
+  {c:"20494",d:"Cantoneira (N) 14 X 30 Nova",pp:12.0,pc:12.0},
+  {c:"20022",d:"Cantoneira perfurada 23 X 23",pp:5.99,pc:7.05},
+  {c:"20474",d:"Cantoneira Perfurada (N) 23 X 23 Nova",pp:10.24,pc:12.05},
+  {c:"20234",d:"Guia 48mm X 3Mt",pp:10.22,pc:12.02},
+  {c:"20473",d:"Guia (N) 48mm X 3Mt Nova",pp:18.0,pc:21.0},
+  {c:"20235",d:"Guia 70mm X 3Mt",pp:12.38,pc:14.56},
+  {c:"20496",d:"Guia (N) 70mm X 3Mt Nova",pp:23.0,pc:25.0},
+  {c:"20236",d:"Guia 90mm X 3Mt",pp:16.36,pc:19.25},
+  {c:"20017",d:"Montante 48mm X 3Mt",pp:12.37,pc:14.56},
+  {c:"20431",d:"Montante (N) 48mm X 3Mt Nova",pp:21.6,pc:24.0},
+  {c:"20016",d:"Montante 70mm X 3Mt",pp:14.11,pc:16.6},
+  {c:"20495",d:"Montante (N) 70mm X 3Mt Nova",pp:25.2,pc:28.0},
+  {c:"20015",d:"Montante 90mm X 3Mt",pp:16.36,pc:19.25},
+  {c:"20020",d:"Chapa Drywall Knauf Branca ST 1,20 X 1,80",pp:34.9,pc:38.9},
+  {c:"20018",d:"Chapa Drywall Knauf Verde RU 1,20 X 1,80",pp:52.06,pc:56.8},
+  {c:"20019",d:"Chapa Drywall Rosa RF 1,20 X 1,80",pp:59.9,pc:65.0},
+  {c:"20465",d:"Chapa Drywall Trevo Branca ST 1,20 X 1,80",pp:36.17,pc:39.9},
+  {c:"20466",d:"Chapa Drywall Trevo Verde RU 1,20 X 1,80",pp:62.2,pc:70.99},
+  {c:"20476",d:"Chapa Drywall Verde RU 1,20 X 2,40 12,5mm",pp:80.0,pc:87.5},
+  {c:"20415",d:"Chapa Drywall 1,20 X 2,40 12,5mm",pp:120.0,pc:120.0},
+  {c:"20162",d:"Chapa Drywall Branca ST 1,20 X 2,40 6mm",pp:60.4,pc:60.4},
+  {c:"20181",d:"Chapa cimenticia 1,20 X 2,40 6mm",pp:75.68,pc:75.68},
+  {c:"20182",d:"Chapa cimenticia 1,20 X 2,40 8mm",pp:98.77,pc:98.77},
+  {c:"20183",d:"Chapa cimenticia 1,20 X 2,40 10mm",pp:134.9,pc:139.9},
+  {c:"20054",d:"Fita Telada Azul 45 MT",pp:14.9,pc:14.9},
+  {c:"20056",d:"Fita Telada Azul 90 MT",pp:19.9,pc:25.0},
+  {c:"20451",d:"Fita Telada Azul 100 MT",pp:25.5,pc:25.5},
+  {c:"20058",d:"Fita Telada Azul 90 MT Knauf",pp:29.17,pc:29.17},
+  {c:"20055",d:"Fita Telada Branca 45 MT",pp:11.63,pc:11.63},
+  {c:"20059",d:"Fita Telada Branca 90 MT",pp:22.5,pc:22.5},
+  {c:"20153",d:"Fita de Papel 150 MT",pp:59.2,pc:59.92},
+  {c:"20048",d:"Parafuso 25 PA MI Ouro Fix",pp:35.5,pc:35.5},
+  {c:"20049",d:"Parafuso 25 PA CT",pp:10.5,pc:10.5},
+  {c:"20039",d:"Parafuso 13 PA CT",pp:13.0,pc:13.0},
+  {c:"20045",d:"Parafuso 35 PA CT",pp:11.0,pc:11.0},
+  {c:"20041",d:"Parafuso 45 PA 50 uni",pp:10.5,pc:10.5},
+  {c:"20077",d:"Parafuso Flangeado No 6",pp:20.0,pc:20.0},
+  {c:"20078",d:"Parafuso Flangeado No 8",pp:29.5,pc:29.5},
+  {c:"20080",d:"Bucha No 6",pp:9.0,pc:9.0},
+  {c:"20003",d:"Prego 15 X 15",pp:10.9,pc:10.9},
+  {c:"20026",d:"La de Rocha 4,32 M2",pp:109.9,pc:109.9},
+  {c:"20027",d:"Massa para Drywall 15 KG",pp:45.9,pc:45.9},
+  {c:"20029",d:"Massa para Drywall 25 Kg",pp:60.5,pc:60.5},
+  {c:"20028",d:"Massa para Drywall 5 Kg",pp:29.5,pc:29.5},
+  {c:"20151",d:"Massa Readyfix 25 Kg",pp:97.55,pc:97.55},
+  {c:"20150",d:"Massa Readyfix 06 Kg",pp:36.91,pc:36.91},
+  {c:"20152",d:"Massa Readyfix 14 KG",pp:65.99,pc:65.99},
+  {c:"20165",d:"Regulador F-530",pp:1.8,pc:1.8},
+  {c:"20167",d:"Regulador Para Montante",pp:3.0,pc:3.0},
+  {c:"20164",d:"Uniao",pp:2.5,pc:2.5},
+  {c:"20432",d:"Uniao Knauf",pp:2.49,pc:2.49},
+  {c:"20168",d:"Tirante 30 CM",pp:1.0,pc:1.0},
+  {c:"20169",d:"Tirante 50 CM",pp:1.53,pc:1.53},
+  {c:"20170",d:"Tirante 1 MT",pp:2.75,pc:2.75},
+  {c:"20171",d:"Tirante 1,5 MT",pp:4.5,pc:4.5},
+  {c:"20172",d:"Tirante 3 MT",pp:8.0,pc:8.0},
+  {c:"20109",d:"Alcapao 20X20",pp:30.0,pc:30.0},
+  {c:"20110",d:"Alcapao 30x30",pp:37.0,pc:37.0},
+  {c:"20111",d:"Alcapao 40x40",pp:45.5,pc:45.5},
+  {c:"20311",d:"Longorina T24 Branco 3,125 MT",pp:17.9,pc:19.0},
+  {c:"20312",d:"Cantoneira T24 Branco 3 MT",pp:14.89,pc:14.9},
+  {c:"20309",d:"Travessa T24 Branco 1,25 MT",pp:8.9,pc:8.9},
+  {c:"20340",d:"Mao de Obra M2",pp:37.0,pc:40.0},
+  {c:"2",d:"Tabica Pintada",pp:11.89,pc:13.99},
+  {c:"20289",d:"Cantoneira PVC 2,5 MT",pp:34.0,pc:38.5},
+  {c:"20034",d:"Espuma expansiva 300 ML",pp:29.0,pc:29.0},
+  {c:"20035",d:"Espuma expansiva 500 ML",pp:32.5,pc:32.5},
+  {c:"20081",d:"Caixa de luz 4X2",pp:5.9,pc:5.9},
+  {c:"20082",d:"Caixa de luz 4X4",pp:6.9,pc:6.9},
+  {c:"289","d":"Massa Corrida PVA 06 Kg",pp:29.9,pc:29.9},
+  {c:"290",d:"Massa Corrida PVA 25 Kg",pp:67.5,pc:67.5},
+  {c:"20148",d:"Guia LSF 70mm X 3Mt",pp:55.9,pc:55.9},
+  {c:"20149",d:"Guia LSF 90mm X 3Mt",pp:72.9,pc:72.9},
+  {c:"20146",d:"Montante LSF 70mm X 3Mt",pp:64.9,pc:64.9},
+  {c:"20147",d:"Montante LSF 90mm X 3Mt",pp:79.9,pc:79.9}
+];
+
+// Mapa por código para lookup rápido
+const MAPA = {};
+CAT.forEach(p=>MAPA[p.c]=p);
+
+let chave = '';
+let itensRev = []; // itens em revisão com opções
+
+// ===== API KEY =====
+function salvarChave(){
+  const k = document.getElementById('apikey').value.trim();
+  if(!k.startsWith('sk-')){alert('Chave inválida. Deve começar com sk-');return}
+  chave = k;
+  try { localStorage.setItem('gpt_key',k); } catch(e){}
+  document.getElementById('card-api').style.background='#F0FFF4';
+  document.getElementById('card-api').style.border='1px solid #86EFAC';
+  document.getElementById('btn-salvar').textContent='✅ Chave Salva!';
+  document.getElementById('btn-salvar').style.background='#1A7A4A';
+  setTimeout(()=>{
+    document.getElementById('btn-salvar').textContent='Salvar';
+    document.getElementById('btn-salvar').style.background='';
+  },3000);
+}
+function verChave(){
+  const inp = document.getElementById('apikey');
+  inp.type = inp.type==='password'?'text':'password';
+  document.getElementById('btn-ver').textContent = inp.type==='password'?'👁 Ver':'🙈 Ocultar';
+}
+function getChave(){
+  return chave || localStorage.getItem('gpt_key') || '';
+}
+
+// ===== TRADUZIR COM GPT =====
+async function traduzir(){
+  const lista = document.getElementById('li').value.trim();
+  if(!lista){alert('Cole a lista de materiais.');return}
+  const key = getChave();
+  if(!key){alert('Insira sua chave da API ChatGPT no campo acima.');return}
+
+  document.getElementById('ld').style.display='flex';
+  document.getElementById('ld-txt').textContent='A IA está interpretando a lista...';
+  document.getElementById('bg').disabled=true;
+  document.getElementById('card-rev').style.display='none';
+  document.getElementById('res').style.display='none';
+
+  // Monta lista de produtos do catálogo para o GPT
+  const catStr = CAT.map(p=>`${p.c}|${p.d}`).join('\n');
+
+  const prompt = `Você é um especialista em materiais de construção da Central do Gesso.
+
+O cliente mandou esta lista pelo WhatsApp:
+${lista}
+
+Abaixo está o catálogo de produtos disponíveis (formato: CODIGO|DESCRICAO):
+${catStr}
+
+Sua tarefa: Para cada item da lista do cliente, identifique o(s) produto(s) mais adequado(s) do catálogo.
+
+REGRAS IMPORTANTES:
+1. Produtos com "(N)" ou "Nova" no nome são linha NOVA (mais cara). Sem "(N)" é linha PADRÃO (mais barata).
+2. Quando o cliente não especifica ST ou RU em chapas, retorne AS DUAS opções.
+3. Quando o cliente não especifica se é linha N ou padrão em perfis, retorne AS DUAS opções.
+4. Fita Telada: preste atenção no metragem (45MT, 90MT, 100MT).
+5. Guia e Montante: preste atenção no tamanho (48mm, 70mm, 90mm).
+6. Se houver apenas UMA opção clara, retorne apenas ela.
+
+Responda APENAS em JSON válido, sem texto adicional:
+{
+  "itens": [
+    {
+      "original": "texto original do cliente",
+      "quantidade": número,
+      "status": "ok" | "opcoes" | "nao_encontrado",
+      "produto": {"codigo": "...", "descricao": "..."} (quando status=ok),
+      "opcoes": [{"codigo":"...","descricao":"..."},{"codigo":"...","descricao":"..."}] (quando status=opcoes),
+      "motivo": "explicação breve quando status=opcoes ou nao_encontrado"
+    }
+  ]
+}`;
+
+  try {
+    const resp = await fetch('https://api.openai.com/v1/chat/completions',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','Authorization':'Bearer '+key},
+      body:JSON.stringify({
+        model:'gpt-4o-mini',
+        messages:[{role:'user',content:prompt}],
+        temperature:0.1,
+        max_tokens:2000
+      })
+    });
+    const data = await resp.json();
+    if(!resp.ok) throw new Error(data.error?.message||'Erro na API');
+    let txt = data.choices[0].message.content.trim();
+    txt = txt.replace(/```json|```/g,'').trim();
+    const parsed = JSON.parse(txt);
+    document.getElementById('ld').style.display='none';
+    document.getElementById('bg').disabled=false;
+    mostrarRevisao(parsed.itens);
+  } catch(e){
+    document.getElementById('ld').style.display='none';
+    document.getElementById('bg').disabled=false;
+    alert('Erro ao chamar a API: '+e.message+'\n\nVerifique sua chave e conexão.');
+  }
+}
+
+// ===== MOSTRAR REVISÃO =====
+function mostrarRevisao(itens){
+  itensRev = itens;
+  const container = document.getElementById('rev-itens');
+  container.innerHTML = '';
+
+  itens.forEach((it,i)=>{
+    const div = document.createElement('div');
+    div.className = 'item-rev';
+
+    let badge = '';
+    let content = '';
+
+    if(it.status === 'ok'){
+      badge = '<span class="badge-ok">✅ Identificado</span>';
+      const p = MAPA[it.produto.codigo];
+      const preco = p ? `PIX: R$ ${p.pp.toFixed(2)} | Cartão: R$ ${p.pc.toFixed(2)}` : '';
+      content = `<div class="opts">
+        <div class="opt sel">
+          <input type="radio" name="opt_${i}" value="${it.produto.codigo}" checked/>
+          <div><strong>${it.produto.descricao}</strong><br/><small style="color:#888">${preco}</small></div>
+        </div>
+      </div>`;
+    } else if(it.status === 'opcoes'){
+      badge = '<span class="badge-warn">⚠️ Múltiplas opções</span>';
+      const opts = it.opcoes.map((op,j)=>{
+        const p = MAPA[op.codigo];
+        const preco = p ? `PIX: R$ ${p.pp.toFixed(2)} | Cartão: R$ ${p.pc.toFixed(2)}` : '';
+        return `<label class="opt" onclick="selecionarOpt(this)">
+          <input type="radio" name="opt_${i}" value="${op.codigo}" ${j===0?'checked':''}/>
+          <div><strong>${op.descricao}</strong><br/><small style="color:#888">${preco}</small></div>
+        </label>`;
+      }).join('');
+      content = `<div style="font-size:11px;color:#8B4500;margin-bottom:6px">💡 ${it.motivo||'Selecione a opção correta:'}</div><div class="opts">${opts}</div>`;
+    } else {
+      badge = '<span class="badge-err">❌ Não encontrado</span>';
+      content = `<div style="font-size:12px;color:#B71C1C;margin-top:4px">Produto não encontrado no catálogo. Será ignorado no orçamento.</div>`;
+    }
+
+    div.innerHTML = `
+      <h4>${badge} ${it.original}</h4>
+      <div class="orig">Solicitado: <em>${it.original}</em></div>
+      ${content}
+      <div class="qty-row">
+        <label>Quantidade:</label>
+        <input type="number" id="qty_${i}" value="${it.quantidade||1}" min="0.1" step="1"/>
+      </div>`;
+    container.appendChild(div);
+  });
+
+  document.getElementById('card-rev').style.display='block';
+  document.getElementById('card-rev').scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+function selecionarOpt(el){
+  const group = el.closest('.opts');
+  group.querySelectorAll('.opt').forEach(o=>o.classList.remove('sel'));
+  el.classList.add('sel');
+}
+
+// ===== GERAR ORÇAMENTO =====
+function gerarOrcamento(){
+  const ITS = [];
+  itensRev.forEach((it,i)=>{
+    if(it.status==='nao_encontrado') return;
+    const radio = document.querySelector(`input[name="opt_${i}"]:checked`);
+    if(!radio) return;
+    const cod = radio.value;
+    const prod = MAPA[cod];
+    if(!prod) return;
+    const qty = parseFloat(document.getElementById('qty_'+i).value)||1;
+    ITS.push({...prod, qty});
+  });
+
+  if(!ITS.length){alert('Nenhum produto selecionado.');return}
+  renderDocs(ITS);
+}
+
+function renderDocs(ITS){
+  document.getElementById('rt').textContent=`${ITS.length} produto(s) no orçamento`;
+  document.getElementById('res').style.display='block';
+  renderDoc('pix',ITS);
+  renderDoc('card',ITS);
+  showTab('pix');
+  document.getElementById('res').scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+function fmt(v){return'R$ '+v.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2})}
+function fd(s){if(!s)return new Date().toLocaleDateString('pt-BR');const[y,m,d]=s.split('-');return d+'/'+m+'/'+y}
+
+function renderDoc(t,ITS){
+  const ip=t==='pix';
+  const d={
+    nome:document.getElementById('cn').value||'CONSUMIDOR FINAL - 1',
+    doc:document.getElementById('cd').value||'',
+    end:document.getElementById('ce').value||'',
+    cidade:document.getElementById('cc').value||'',
+    num:document.getElementById('on').value||'—',
+    data:document.getElementById('od').value,
+    vend:document.getElementById('ov').value||'Fernando Fernandes',
+    frete:parseFloat(document.getElementById('of').value)||0
+  };
+  const tot=ITS.reduce((s,i)=>s+(ip?i.pp:i.pc)*i.qty,0);
+  const tg=tot+d.frete;
+  const qtd=ITS.reduce((s,i)=>s+i.qty,0);
+  const pl=ip?'PIX':'CARTÃO DE CRÉDITO';
+  const pc=ip?'ppix':'pcard';
+  const fr=d.frete>0?`<div class="dr"><span>Valor do Frete:</span><span>${fmt(d.frete)}</span></div>`:'';
+  const ft=d.frete>0?'Tipo de Frete: Emitente':'Tipo de Frete: Sem cobrança';
+  const rows=ITS.map((it,i)=>{
+    const v=ip?it.pp:it.pc;
+    return`<tr><td>${i+1}</td><td>${it.c}</td><td>${it.d}</td><td>5102</td><td></td><td>UN</td><td>${it.qty}</td><td>R$ ${v.toLocaleString('pt-BR',{minimumFractionDigits:3,maximumFractionDigits:3})}</td><td>${fmt(v*it.qty)}</td><td>0 dias</td></tr>`;
+  }).join('');
+
+  document.getElementById(t==='pix'?'ppix':'pcard').innerHTML=`<div class="doc">
+  <div class="dh"><div class="dlogo">CENTRAL<br>DO<br>GESSO</div><div class="demp"><strong>CENTRAL DO GESSO</strong><p>Rod. Régis Bittencourt 2060, - Cidade Intercap</p><p>06768-000 Taboão da Serra / SP | Tel. (11)4787-9100</p><p>Cnpj 29.289.666/0001-93 - Insc.Est. 675435490119</p><p>Email loja@centraldogessotaboao.com.br</p></div><div class="dnum"><div class="dlb">Orçamento de Venda</div><div class="dnb">${d.num}</div></div></div>
+  <hr class="dhr"/>
+  <div class="ddes"><div style="font-size:8.5px;color:#888;margin-bottom:2px">Destinatário/Remetente</div><strong>${d.nome}</strong><br/>${d.end?d.end+'<br/>':''>${d.cidade?d.cidade+'<br/>':''}<span style="display:block;margin-top:2px">${d.doc}</span><span>Contatos:</span></div>
+  <div class="dmeta"><div><p>Dados Complementares</p><p>Posição: <strong>Geral (1)</strong></p><p style="margin-top:4px"><strong>Data: ${fd(d.data)}</strong></p><p>Forma de Pagamento: <span class="pb ${pc}">${pl}</span></p></div><div style="text-align:right"><p>Indicado por:</p><p style="margin-top:4px"><strong>Representante/Consultor: ${d.vend}</strong></p></div></div>
+  <div class="dstit">Detalhamento dos Produtos</div>
+  <table class="dtab"><thead><tr><th></th><th>Código</th><th>Descrição do Produto</th><th>CFOP</th><th>Ref.</th><th>Und.</th><th>Qtd.</th><th>V.Unit.</th><th>V.Total</th><th>Prev.</th></tr></thead><tbody>${rows}</tbody></table>
+  <div class="dsum"><span><strong>${ITS.length} Item(ns)</strong> &nbsp; <strong>${qtd} Peça(s)</strong></span><span>Total dos produtos: ${fmt(tot)}</span></div>
+  <div class="dstit">Totalização do Orçamento:</div>
+  <div class="dtot"><div class="dr"><span>Total do orçamento:</span><span>${fmt(tot)}</span></div>${fr}<div class="dr drg"><span>Total Geral do orçamento:</span><span>${fmt(tg)}</span></div></div>
+  <div class="dobs"><p>${ft}</p><br/><p>Observações</p><p>Proposta válida por 1 dia.</p><br/><p>ENTREGA | FRETE</p><p>VEICULO:</p><p>PLACA</p></div>
+  <div class="dfoot">Impresso em: ${fd(d.data)} — ${d.vend}</div></div>`;
+}
+
+function showTab(t){
+  document.getElementById('ppix').style.display=t==='pix'?'block':'none';
+  document.getElementById('pcard').style.display=t==='card'?'block':'none';
+  document.getElementById('tpix').className='tab'+(t==='pix'?' tp':'');
+  document.getElementById('tcard').className='tab'+(t==='card'?' tc':'');
+}
+
+function imprimir(t){
+  const ip=t==='pix';
+  const c=document.getElementById(t==='pix'?'ppix':'pcard').innerHTML;
+  const w=window.open('','_blank');
+  w.document.write(`<!DOCTYPE html><html><head><title>Orçamento ${ip?'PIX':'Cartão'}</title><style>*{box-sizing:border-box;margin:0;padding:0}body{background:#e8e6e0;padding:20px;font-family:Arial,sans-serif}.doc{background:#fff;max-width:680px;margin:0 auto;padding:28px 32px;font-size:10.5px;color:#1a1a1a}.dh{display:flex;align-items:flex-start;gap:14px;margin-bottom:14px}.dlogo{width:72px;height:34px;background:#C8201A;border-radius:4px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:8px;font-weight:800;text-align:center;line-height:1.3;flex-shrink:0}.demp{flex:1}.demp strong{font-size:11px}.demp p{font-size:9px;color:#555;margin:1px 0}.dnum{text-align:right}.dlb{font-size:8.5px;color:#888}.dnb{font-size:20px;font-weight:700}.dhr{border:none;border-top:1px solid #ccc;margin:10px 0}.ddes{margin-bottom:10px;font-size:9.5px}.ddes strong{font-size:10.5px}.dmeta{display:flex;justify-content:space-between;margin-bottom:12px;font-size:9.5px}.pb{display:inline-block;padding:2px 8px;border-radius:10px;font-size:8.5px;font-weight:700}.ppix{background:#d4f5ea;color:#0a6644}.pcard{background:#dbeeff;color:#0a3d7a}.dstit{font-size:9px;color:#666;margin-bottom:5px}.dtab{width:100%;border-collapse:collapse;font-size:8.5px;margin-bottom:12px}.dtab th{background:#f0f0f0;padding:4px 5px;text-align:left;border-bottom:1px solid #ccc;font-size:8px;font-weight:700}.dtab td{padding:3px 5px;border-bottom:.5px solid #eee}.dsum{display:flex;justify-content:space-between;font-size:9px;margin-bottom:12px}.dtot{text-align:right;font-size:9.5px}.dr{display:flex;justify-content:flex-end;gap:20px;margin:2px 0}.drg{font-weight:700;font-size:10.5px;border-top:1px solid #999;padding-top:4px;margin-top:4px}.dfoot{margin-top:12px;font-size:8.5px;color:#777;border-top:.5px solid #ddd;padding-top:6px}.dobs{font-size:9px;color:#555;margin-top:10px}@media print{body{background:#fff;padding:0}}</style></head><body>${c}<script>window.onload=()=>window.print()<\/script></body></html>`);
+  w.document.close();
+}
+
+function voltarLista(){document.getElementById('card-rev').style.display='none'}
+function novoOrc(){document.getElementById('res').style.display='none';document.getElementById('card-rev').style.display='none';document.getElementById('li').value='';document.getElementById('li').focus()}
+
+// Init
+document.getElementById('od').value=new Date().toISOString().split('T')[0];
+try { const k=localStorage.getItem('gpt_key'); if(k){document.getElementById('apikey').value=k;chave=k;} } catch(e){}
+</script>
+</body>
+</html>
