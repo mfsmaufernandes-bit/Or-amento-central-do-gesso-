@@ -101,14 +101,14 @@ textarea{resize:vertical;min-height:110px}
 
 <!-- STEP 0: API KEY -->
 <div class="card" id="card-api">
-  <div class="sh"><div class="sn">🔑</div><div><div class="st">Chave da API ChatGPT</div><div class="ss">Necessária para o tradutor inteligente funcionar</div></div></div>
-  <div class="info">A chave é salva apenas no seu navegador (localStorage) e nunca sai do seu computador. Você só precisa inserir uma vez.</div>
+  <div class="sh"><div class="sn">🔑</div><div><div class="st">Chave da API Claude (Anthropic)</div><div class="ss">Necessária para o tradutor inteligente funcionar</div></div></div>
+  <div class="info">A chave é salva apenas no seu navegador e nunca sai do seu computador. Você só precisa inserir uma vez.</div>
   <div class="apikey-row">
-    <input type="password" id="apikey" placeholder="sk-..." autocomplete="off"/>
+    <input type="password" id="apikey" placeholder="sk-ant-..." autocomplete="off"/>
     <button class="btn bp" id="btn-salvar" onclick="salvarChave()">Salvar</button>
     <button class="btn bs" onclick="verChave()" id="btn-ver">👁 Ver</button>
   </div>
-  <div class="api-hint">Obtenha sua chave em <strong>platform.openai.com/api-keys</strong></div>
+  <div class="api-hint">Obtenha sua chave em <strong>console.anthropic.com</strong> → API Keys</div>
 </div>
 
 <!-- STEP 1: DADOS -->
@@ -351,19 +351,23 @@ Responda APENAS em JSON válido, sem texto adicional:
 }`;
 
   try {
-    const resp = await fetch('https://api.openai.com/v1/chat/completions',{
+    const resp = await fetch('https://api.anthropic.com/v1/messages',{
       method:'POST',
-      headers:{'Content-Type':'application/json','Authorization':'Bearer '+key},
+      headers:{
+        'Content-Type':'application/json',
+        'x-api-key':key,
+        'anthropic-version':'2023-06-01',
+        'anthropic-dangerous-direct-browser-access':'true'
+      },
       body:JSON.stringify({
-        model:'gpt-4o-mini',
-        messages:[{role:'user',content:prompt}],
-        temperature:0.1,
-        max_tokens:2000
+        model:'claude-haiku-4-5-20251001',
+        max_tokens:2000,
+        messages:[{role:'user',content:prompt}]
       })
     });
     const data = await resp.json();
     if(!resp.ok) throw new Error(data.error?.message||'Erro na API');
-    let txt = data.choices[0].message.content.trim();
+    let txt = data.content[0].text.trim();
     txt = txt.replace(/```json|```/g,'').trim();
     const parsed = JSON.parse(txt);
     document.getElementById('ld').style.display='none';
