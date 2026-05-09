@@ -263,7 +263,7 @@ const CAT = [
   {c:"20035",d:"Espuma expansiva 500 ML",pp:32.5,pc:32.5},
   {c:"20081",d:"Caixa de luz 4X2",pp:5.9,pc:5.9},
   {c:"20082",d:"Caixa de luz 4X4",pp:6.9,pc:6.9},
-  {c:"289","d":"Massa Corrida PVA 06 Kg",pp:29.9,pc:29.9},
+  {c:"289",d:"Massa Corrida PVA 06 Kg",pp:29.9,pc:29.9},
   {c:"290",d:"Massa Corrida PVA 25 Kg",pp:67.5,pc:67.5},
   {c:"20148",d:"Guia LSF 70mm X 3Mt",pp:55.9,pc:55.9},
   {c:"20149",d:"Guia LSF 90mm X 3Mt",pp:72.9,pc:72.9},
@@ -281,7 +281,7 @@ let itensRev = []; // itens em revisão com opções
 // ===== API KEY =====
 function salvarChave(){
   const k = document.getElementById('apikey').value.trim();
-  if(!k.startsWith('sk-')){alert('Chave inválida. Deve começar com sk-');return}
+  if(!k.startsWith('sk-')){alert('Chave inválida. Deve começar com sk- ou sk-proj-');return}
   chave = k;
   try { localStorage.setItem('gpt_key',k); } catch(e){}
   document.getElementById('card-api').style.background='#F0FFF4';
@@ -493,7 +493,7 @@ function renderDoc(t,ITS){
   document.getElementById(t==='pix'?'ppix':'pcard').innerHTML=`<div class="doc">
   <div class="dh"><div class="dlogo">CENTRAL<br>DO<br>GESSO</div><div class="demp"><strong>CENTRAL DO GESSO</strong><p>Rod. Régis Bittencourt 2060, - Cidade Intercap</p><p>06768-000 Taboão da Serra / SP | Tel. (11)4787-9100</p><p>Cnpj 29.289.666/0001-93 - Insc.Est. 675435490119</p><p>Email loja@centraldogessotaboao.com.br</p></div><div class="dnum"><div class="dlb">Orçamento de Venda</div><div class="dnb">${d.num}</div></div></div>
   <hr class="dhr"/>
-  <div class="ddes"><div style="font-size:8.5px;color:#888;margin-bottom:2px">Destinatário/Remetente</div><strong>${d.nome}</strong><br/>${d.end?d.end+'<br/>':''>${d.cidade?d.cidade+'<br/>':''}<span style="display:block;margin-top:2px">${d.doc}</span><span>Contatos:</span></div>
+  <div class="ddes"><div style="font-size:8.5px;color:#888;margin-bottom:2px">Destinatário/Remetente</div><strong>${d.nome}</strong><br/>${d.end?d.end+'<br/>':''}${d.cidade?d.cidade+'<br/>':''}<span style="display:block;margin-top:2px">${d.doc}</span><span>Contatos:</span></div>
   <div class="dmeta"><div><p>Dados Complementares</p><p>Posição: <strong>Geral (1)</strong></p><p style="margin-top:4px"><strong>Data: ${fd(d.data)}</strong></p><p>Forma de Pagamento: <span class="pb ${pc}">${pl}</span></p></div><div style="text-align:right"><p>Indicado por:</p><p style="margin-top:4px"><strong>Representante/Consultor: ${d.vend}</strong></p></div></div>
   <div class="dstit">Detalhamento dos Produtos</div>
   <table class="dtab"><thead><tr><th></th><th>Código</th><th>Descrição do Produto</th><th>CFOP</th><th>Ref.</th><th>Und.</th><th>Qtd.</th><th>V.Unit.</th><th>V.Total</th><th>Prev.</th></tr></thead><tbody>${rows}</tbody></table>
