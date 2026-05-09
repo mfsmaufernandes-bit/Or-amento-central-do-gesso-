@@ -280,18 +280,18 @@ let itensRev = []; // itens em revisão com opções
 
 // ===== API KEY =====
 function salvarChave(){
-  const k = document.getElementById('apikey').value.trim();
-  if(!k.startsWith('sk-')){alert('Chave inválida. Deve começar com sk- ou sk-proj-');return}
+  const k = document.getElementById('apikey').value.trim().replace(/\s/g,'');
+  if(!k.startsWith('sk-')){alert('Chave inválida. Deve começar com sk-ant-...');return}
   chave = k;
   try { localStorage.setItem('gpt_key',k); } catch(e){}
   document.getElementById('card-api').style.background='#F0FFF4';
   document.getElementById('card-api').style.border='1px solid #86EFAC';
-  document.getElementById('btn-salvar').textContent='✅ Chave Salva!';
+  document.getElementById('btn-salvar').textContent='✅ Chave Salva! ('+k.length+' caracteres)';
   document.getElementById('btn-salvar').style.background='#1A7A4A';
   setTimeout(()=>{
     document.getElementById('btn-salvar').textContent='Salvar';
     document.getElementById('btn-salvar').style.background='';
-  },3000);
+  },5000);
 }
 function verChave(){
   const inp = document.getElementById('apikey');
@@ -302,12 +302,12 @@ function getChave(){
   return chave || localStorage.getItem('gpt_key') || '';
 }
 
-// ===== TRADUZIR COM GPT =====
+// ===== TRADUZIR COM CLAUDE =====
 async function traduzir(){
   const lista = document.getElementById('li').value.trim();
   if(!lista){alert('Cole a lista de materiais.');return}
   const key = getChave();
-  if(!key){alert('Insira sua chave da API ChatGPT no campo acima.');return}
+  if(!key){alert('Insira sua chave da API Claude no campo acima.');return}
 
   document.getElementById('ld').style.display='flex';
   document.getElementById('ld-txt').textContent='A IA está interpretando a lista...';
