@@ -107,6 +107,7 @@ textarea{resize:vertical;min-height:110px}
     <input type="password" id="apikey" placeholder="sk-ant-..." autocomplete="off"/>
     <button class="btn bp" id="btn-salvar" onclick="salvarChave()">Salvar</button>
     <button class="btn bs" onclick="verChave()" id="btn-ver">👁 Ver</button>
+    <button class="btn bs" onclick="limparChave()" style="color:#B71C1C">🗑 Limpar</button>
   </div>
   <div class="api-hint">Obtenha sua chave em <strong>console.anthropic.com</strong> → API Keys</div>
 </div>
@@ -298,8 +299,19 @@ function verChave(){
   inp.type = inp.type==='password'?'text':'password';
   document.getElementById('btn-ver').textContent = inp.type==='password'?'👁 Ver':'🙈 Ocultar';
 }
+function limparChave(){
+  chave = '';
+  try { localStorage.removeItem('gpt_key'); } catch(e){}
+  document.getElementById('apikey').value='';
+  document.getElementById('card-api').style.background='';
+  document.getElementById('card-api').style.border='';
+  alert('Chave removida! Cole a nova chave do Claude e clique Salvar.');
+}
 function getChave(){
-  return chave || localStorage.getItem('gpt_key') || '';
+  // Sempre prioriza o que está no campo
+  const campo = document.getElementById('apikey').value.trim().replace(/\s/g,'');
+  if(campo && campo.startsWith('sk-')) return campo;
+  return chave || '';
 }
 
 // ===== TRADUZIR COM CLAUDE =====
@@ -528,7 +540,6 @@ function novoOrc(){document.getElementById('res').style.display='none';document.
 
 // Init
 document.getElementById('od').value=new Date().toISOString().split('T')[0];
-try { const k=localStorage.getItem('gpt_key'); if(k){document.getElementById('apikey').value=k;chave=k;} } catch(e){}
 </script>
 </body>
 </html>
